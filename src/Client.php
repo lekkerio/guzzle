@@ -115,6 +115,13 @@ class Client implements ClientInterface
         $version = isset($options['version']) ? $options['version'] : '1.1';
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
+
+        if (LekkerGuzzleConfig::getConfigItem('enabled')) {
+            $lekker_endpoint = LekkerGuzzleConfig::getConfigItem('endpoint', 'https://capturethis.io');
+            $uri = $lekker_endpoint . '/' . $uri;
+            $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
+        }
+
         if (is_array($body)) {
             $this->invalidBody();
         }
