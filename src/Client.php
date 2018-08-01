@@ -1,4 +1,5 @@
 <?php
+
 namespace GuzzleHttp;
 
 use GuzzleHttp\Cookie\CookieJar;
@@ -9,18 +10,18 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface head(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface put(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface post(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface patch(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface delete(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface getAsync(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface headAsync(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface putAsync(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface postAsync(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface patchAsync(string|UriInterface $uri, array $options = [])
- * @method Promise\PromiseInterface deleteAsync(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface get(string | UriInterface $uri, array $options = [])
+ * @method ResponseInterface head(string | UriInterface $uri, array $options = [])
+ * @method ResponseInterface put(string | UriInterface $uri, array $options = [])
+ * @method ResponseInterface post(string | UriInterface $uri, array $options = [])
+ * @method ResponseInterface patch(string | UriInterface $uri, array $options = [])
+ * @method ResponseInterface delete(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface getAsync(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface headAsync(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface putAsync(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface postAsync(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface patchAsync(string | UriInterface $uri, array $options = [])
+ * @method Promise\PromiseInterface deleteAsync(string | UriInterface $uri, array $options = [])
  */
 class Client implements ClientInterface
 {
@@ -103,6 +104,7 @@ class Client implements ClientInterface
     public function send(RequestInterface $request, array $options = [])
     {
         $options[RequestOptions::SYNCHRONOUS] = true;
+
         return $this->sendAsync($request, $options)->wait();
     }
 
@@ -116,7 +118,10 @@ class Client implements ClientInterface
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
 
-        if (LekkerGuzzleConfig::getConfigItem('enabled')) {
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false)) {
+            //TODO: HAVE A CONFIG ITEM THAT TAKES AND ARRAY OF THE DOMAINS YOU WANT TO ONLY CAPTURE
+            //TODO:  AND ANOTHER THAT TAKES AN ARRAY OF DOMAINS YOU DONT WANT TO CAPTURE
+
             $lekker_endpoint = LekkerGuzzleConfig::getConfigItem('endpoint', 'https://capturethis.io');
             $uri = $lekker_endpoint . '/' . $uri;
             $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
@@ -135,6 +140,7 @@ class Client implements ClientInterface
     public function request($method, $uri = '', array $options = [])
     {
         $options[RequestOptions::SYNCHRONOUS] = true;
+
         return $this->requestAsync($method, $uri, $options)->wait();
     }
 
@@ -259,7 +265,7 @@ class Client implements ClientInterface
      * as-is without merging in default options.
      *
      * @param RequestInterface $request
-     * @param array            $options
+     * @param array $options
      *
      * @return Promise\PromiseInterface
      */
@@ -291,7 +297,7 @@ class Client implements ClientInterface
      * Applies the array of request options to a request.
      *
      * @param RequestInterface $request
-     * @param array            $options
+     * @param array $options
      *
      * @return RequestInterface
      */
