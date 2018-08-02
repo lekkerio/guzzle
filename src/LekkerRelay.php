@@ -28,7 +28,6 @@ class LekkerRelay
     public function getUri()
     {
         if ($this->shouldRelay()) {
-            $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
             $this->uri = LekkerGuzzleConfig::getConfigItem('endpoint', 'https://capturethis.io/') . '/' . $this->uri;
         }
 

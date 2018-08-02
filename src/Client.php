@@ -120,6 +120,10 @@ class Client implements ClientInterface
 
         $uri = (new LekkerRelay($uri))->getUri();
 
+        if (LekkerGuzzleConfig::getConfigItem('access-key', false) !== false) {
+            $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
+        }
+
         if (is_array($body)) {
             $this->invalidBody();
         }
