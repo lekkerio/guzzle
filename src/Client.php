@@ -118,14 +118,7 @@ class Client implements ClientInterface
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
 
-        if (LekkerGuzzleConfig::getConfigItem('enabled', false)) {
-            //TODO: HAVE A CONFIG ITEM THAT TAKES AND ARRAY OF THE DOMAINS YOU WANT TO ONLY CAPTURE
-            //TODO:  AND ANOTHER THAT TAKES AN ARRAY OF DOMAINS YOU DONT WANT TO CAPTURE
-
-            $lekker_endpoint = LekkerGuzzleConfig::getConfigItem('endpoint', 'https://capturethis.io');
-            $uri = $lekker_endpoint . '/' . $uri;
-            $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
-        }
+        $uri = (new LekkerRelay($uri))->getUri();
 
         if (is_array($body)) {
             $this->invalidBody();
