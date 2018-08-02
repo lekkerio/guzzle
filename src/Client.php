@@ -425,4 +425,18 @@ class Client implements ClientInterface
             . 'application/x-www-form-urlencoded request, or the "multipart" '
             . 'request option to send a multipart/form-data request.');
     }
+
+    public function enableLekker()
+    {
+        LekkerGuzzleConfig::setConfigItem('enabled', true);
+
+        return $this;
+    }
+
+    public function lekkerAccessKey($key)
+    {
+        LekkerGuzzleConfig::setConfigItem('access-key', $key);
+
+        return $this;
+    }
 }
