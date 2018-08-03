@@ -123,7 +123,7 @@ class Client implements ClientInterface
         if (LekkerGuzzleConfig::getConfigItem('enabled', false)) {
             $uri = (new LekkerRelay($uri))->getUri();
             $custom_headers = $this->getLekkerHeaders();
-            array_merge($headers, $custom_headers);
+            $headers = array_merge($headers, $custom_headers);
         }
 
         if (is_array($body)) {
