@@ -61,7 +61,7 @@ class LekkerGuzzleConfig
      */
     public static function getConfigItem($key, $fallback = null)
     {
-        return isset(self::$config[$key]) ? self::$config[$key] : $fallback;
+        return !isset(self::$config[$key]) || empty($config[$key]) ? $fallback : self::$config[$key];
     }
 
     /**

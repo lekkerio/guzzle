@@ -126,7 +126,7 @@ class Client implements ClientInterface
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
 
-        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && $this->bypass_lekker === false) {
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('access-key', false) && $this->bypass_lekker === false) {
             $uri = (new LekkerRelay($uri))->getUri();
             $custom_headers = $this->getLekkerHeaders();
             $headers = array_merge($headers, $custom_headers);
@@ -299,7 +299,7 @@ class Client implements ClientInterface
 
 
         //if lekker enabled and mode is sideload
-        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('mode', 'sideload') && $this->bypass_lekker === false) {
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('access-key', false) && LekkerGuzzleConfig::getConfigItem('mode', 'sideload') && $this->bypass_lekker === false) {
             $response->then(function ($result) use ($request) {
                 $client = new self([], true);
                 $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', 'https://capturethis.io/sideload'), [
@@ -509,7 +509,6 @@ class Client implements ClientInterface
         foreach (LekkerGuzzleConfig::getGlobalData() as $key => $value) {
             $headers['Lekkerio-Data-' . $key] = $value;
         }
-
 
         $this->lekker_headers['Lekkerio-Access-Key'] = LekkerGuzzleConfig::getConfigItem('access-key');
 
