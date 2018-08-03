@@ -30,6 +30,8 @@ class Client implements ClientInterface
 
     protected $lekker_headers = [];
 
+    protected $bypass_lekker = false;
+
     /**
      * Clients accept an array of constructor parameters.
      *
@@ -62,7 +64,7 @@ class Client implements ClientInterface
      *
      * @see \GuzzleHttp\RequestOptions for a list of available request options.
      */
-    public function __construct(array $config = [])
+    public function __construct(array $config = [], $bypass_lekker = false)
     {
         if (!isset($config['handler'])) {
             $config['handler'] = HandlerStack::create();
@@ -74,6 +76,8 @@ class Client implements ClientInterface
         if (isset($config['base_uri'])) {
             $config['base_uri'] = Psr7\uri_for($config['base_uri']);
         }
+
+        $this->bypass_lekker = $bypass_lekker;
 
         $this->configureDefaults($config);
     }
@@ -120,7 +124,7 @@ class Client implements ClientInterface
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
 
-        if (LekkerGuzzleConfig::getConfigItem('enabled', false)) {
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && $this->bypass_lekker === false) {
             $uri = (new LekkerRelay($uri))->getUri();
             $custom_headers = $this->getLekkerHeaders();
             $headers = array_merge($headers, $custom_headers);
@@ -286,10 +290,23 @@ class Client implements ClientInterface
         $handler = $options['handler'];
 
         try {
-            return Promise\promise_for($handler($request, $options));
+            $response = Promise\promise_for($handler($request, $options));
         } catch (\Exception $e) {
-            return Promise\rejection_for($e);
+            $response = Promise\rejection_for($e);
         }
+
+        //if lekker enabled and mode is sideload
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('mode', 'sideload') && $this->bypass_lekker === false) {
+            $client = new self([], true);
+
+            $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', ''), [
+                \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (strinG)$request->getBody(), 'response' => $response]
+            ]);
+
+            $request->dd((string)$sideload_response->getBody());
+        }
+
+        return $response;
     }
 
     /**
