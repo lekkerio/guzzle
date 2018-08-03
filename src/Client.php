@@ -32,6 +32,8 @@ class Client implements ClientInterface
 
     protected $bypass_lekker = false;
 
+    protected $raw_request;
+
     /**
      * Clients accept an array of constructor parameters.
      *
@@ -295,15 +297,15 @@ class Client implements ClientInterface
             $response = Promise\rejection_for($e);
         }
 
+
         //if lekker enabled and mode is sideload
         if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('mode', 'sideload') && $this->bypass_lekker === false) {
-            $client = new self([], true);
-
-            $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', ''), [
-                \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (string)$request->getBody(), 'response' => $response]
-            ]);
-
-            dd((string)$sideload_response->getBody());
+            $response->then(function ($result) use ($request) {
+                $client = new self([], true);
+                $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', ''), [
+                    \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (string)$request->getBody(), 'response_headers' => $result->getHeaders(), 'response_body' => (string)$result->getBody()]
+                ]);
+            });
         }
 
         return $response;
