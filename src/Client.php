@@ -302,7 +302,7 @@ class Client implements ClientInterface
         if (LekkerGuzzleConfig::getConfigItem('enabled', false) && LekkerGuzzleConfig::getConfigItem('mode', 'sideload') && $this->bypass_lekker === false) {
             $response->then(function ($result) use ($request) {
                 $client = new self([], true);
-                $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', ''), [
+                $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', 'https://capturethis.io/sideload'), [
                     \GuzzleHttp\RequestOptions::JSON => [
                         'custom_headers'   => $this->getLekkerHeaders(),
                         'request_headers'  => $request->getHeaders(),
