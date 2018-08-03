@@ -74,12 +74,28 @@ class LekkerGuzzleConfig
     }
 
     /**
+     * @param $user_data
+     */
+    public static function setGlobalUser($user_data)
+    {
+        self::$global_user = $user_data;
+    }
+
+    /**
      * @param $key
      * @param $value
      */
     public static function setGlobalDataItem($key, $value)
     {
         self::$global_data[$key] = $value;
+    }
+
+    /**
+     * @param $data_array
+     */
+    public static function setGlobalData($data_array)
+    {
+        self::$global_data = $data_array;
     }
 
     /**
