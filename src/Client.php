@@ -501,11 +501,15 @@ class Client implements ClientInterface
 
     public function getLekkerHeaders()
     {
-        $headers = array_merge(
-            LekkerGuzzleConfig::getGlobalHeaders(),
-            LekkerGuzzleConfig::getGlobalUser(),
-            LekkerGuzzleConfig::getGlobalData()
-        );
+
+        $headers = LekkerGuzzleConfig::getGlobalHeaders();
+        foreach (LekkerGuzzleConfig::getGlobalUser() as $key => $value) {
+            $headers['Lekkerio-User-' . $key] = $value;
+        }
+        foreach (LekkerGuzzleConfig::getGlobalData() as $key => $value) {
+            $headers['Lekkerio-Data-' . $key] = $value;
+        }
+
 
         $this->lekker_headers['Lekkerio-Access-Key'] = LekkerGuzzleConfig::getConfigItem('access-key');
 
