@@ -28,6 +28,8 @@ class Client implements ClientInterface
     /** @var array Default request options */
     private $config;
 
+    protected $lekker_headers = [];
+
     /**
      * Clients accept an array of constructor parameters.
      *
@@ -118,10 +120,10 @@ class Client implements ClientInterface
         // Merge the URI into the base URI.
         $uri = $this->buildUri($uri, $options);
 
-        $uri = (new LekkerRelay($uri))->getUri();
-
-        if (LekkerGuzzleConfig::getConfigItem('access-key', false) !== false) {
-            $headers['Lekkerio-access-key'] = LekkerGuzzleConfig::getConfigItem('access-key');
+        if (LekkerGuzzleConfig::getConfigItem('enabled', false)) {
+            $uri = (new LekkerRelay($uri))->getUri();
+            $custom_headers = $this->getLekkerHeaders();
+            array_merge($headers, $custom_headers);
         }
 
         if (is_array($body)) {
@@ -442,5 +444,50 @@ class Client implements ClientInterface
         LekkerGuzzleConfig::setConfigItem('access-key', $key);
 
         return $this;
+    }
+
+    public function setLekkerUser($user_details = [], $global = false)
+    {
+        foreach ($user_details as $key => $value) {
+            if (is_array($value) or is_object($value)) {
+                throw new \Exception('Lekker user values can not be arrays or objects');
+            }
+
+            if ($global) {
+                LekkerGuzzleConfig::setGlobalHeader('Lekkerio-User-' . $key, $value);
+            } else {
+                $this->lekker_headers['Lekkerio-User-' . $key] = $value;
+            }
+        }
+    }
+
+    public function addLekkerData($key, $value, $global = false)
+    {
+        if (is_array($value) or is_object($value)) {
+            throw new \Exception('Lekker user values can not be arrays or objects');
+        }
+
+        if ($global) {
+            LekkerGuzzleConfig::setGlobalHeader('Lekkerio-Data-' . $key, $value);
+        } else {
+            $this->lekker_headers['Lekkerio-Data-' . $key] = $value;
+        }
+    }
+
+    public function getLekkerHeaders()
+    {
+        $headers = array_merge(
+            LekkerGuzzleConfig::getGlobalHeaders(),
+            LekkerGuzzleConfig::getGlobalUser(),
+            LekkerGuzzleConfig::getGlobalData()
+        );
+
+        $this->lekker_headers['Lekkerio-Access-Key'] = LekkerGuzzleConfig::getConfigItem('access-key');
+
+        foreach ($this->lekker_headers as $key => $value) {
+            $headers[$key] = $value;
+        }
+
+        return $headers;
     }
 }
