@@ -300,7 +300,7 @@ class Client implements ClientInterface
             $client = new self([], true);
 
             $sideload_response = $client->post(LekkerGuzzleConfig::getConfigItem('sideload_endpoint', ''), [
-                \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (strinG)$request->getBody(), 'response' => $response]
+                \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (string)$request->getBody(), 'response' => $response]
             ]);
 
             $request->dd((string)$sideload_response->getBody());
