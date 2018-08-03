@@ -303,7 +303,7 @@ class Client implements ClientInterface
                 \GuzzleHttp\RequestOptions::JSON => ['request_headers' => $request->getHeaders(), 'request_body' => (string)$request->getBody(), 'response' => $response]
             ]);
 
-            $request->dd((string)$sideload_response->getBody());
+            dd((string)$sideload_response->getBody());
         }
 
         return $response;
